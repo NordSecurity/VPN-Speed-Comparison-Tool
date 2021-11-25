@@ -1,0 +1,14 @@
+#!/usr/bin/expect -- 
+
+set target [lindex $argv 0]
+# set passwd [lindex $argv 1]
+
+set timeout 360
+
+spawn nordvpn connect "$target"
+
+expect {
+     "You are connected to" { exit 0 }
+     timeout { puts stderr "Timeouted" ; exit 1 }
+     eof { puts stderr "Failed to connect!" ; exit 1}
+}

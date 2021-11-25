@@ -1,0 +1,15 @@
+conn vpnspeed
+        keyexchange=ikev2
+        dpdaction=clear
+        dpddelay=300s
+        eap_identity="{{ username }}"
+        leftauth=eap-mschapv2
+        left=%defaultroute
+        leftsourceip=%config
+        right={{ server }}
+        rightauth=pubkey
+        rightsubnet=0.0.0.0/0
+        rightid=%{{ server }}
+        rightca=/etc/ipsec.d/cacerts/SurfShark.pem
+        type=tunnel
+        auto=add

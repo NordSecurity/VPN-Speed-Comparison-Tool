@@ -1,0 +1,7 @@
+constraints {
+
+    # Whether to load the plugin. Can also be an integer to increase the
+    # priority of this plugin.
+    load = no
+
+}

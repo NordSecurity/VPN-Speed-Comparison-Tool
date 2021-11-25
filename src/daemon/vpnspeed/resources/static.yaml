@@ -1,0 +1,407 @@
+---
+plugin:
+  vpn:
+    openvpn:
+      config_dir: /etc/openvpn/
+      ip_checker_url: https://ident.me
+    ipsec/ikev2:
+      config_dir: /etc/ipsec.d
+      ip_checker_url: https://ident.me
+    wireguard:
+      config_dir: /etc/wireguard/
+      ip_checker_url: https://ident.me
+  images:
+    wireguard: wireguard
+    expressvpn-app: expressvpn
+    pia-app: pia
+    purevpn-app: pure
+    openvpn: openvpn
+    ipsec/ikev2: ipsec/ikev2
+    nordvpn-app: nordvpn
+  provider:
+
+
+
+
+    pia-app:
+      country:
+        ch:
+          - switzerland
+        cz:
+          - czech-republic
+        lu:
+          - luxembourg
+        li:
+          - liechtenstein
+        be:
+          - belgium
+        nl:
+          - netherlands
+        at:
+          - austria
+        pl:
+          - poland
+        no:
+          - norway
+        fr:
+          - france
+        lv:
+          - latvia
+        mc:
+          - monaco
+        mt:
+          - malta
+        im:
+          - isle-of-man
+        es:
+          - spain
+        sk:
+          - slovakia
+        ba:
+          - bosnia-and-herzegovina
+        md:
+          - moldova
+        me:
+          - montenegro
+        ie:
+          - ireland
+        dz:
+          - algeria
+        eg:
+          - egypt
+        cy:
+          - cyprus
+        ad:
+          - andorra
+        ro:
+          - romania
+        ga:
+          - georgia
+        rs:
+          - serbia
+        bg:
+          - bulgaria
+        ma:
+          - morocco
+        mk:
+          - macedonia
+        am:
+          - armenia
+        il:
+          - israel
+        tr:
+          - turkey
+        ua:
+          - ukraine
+        kz:
+          - kazakhstan
+        pt:
+          - portugal
+        gr:
+          - greece
+        ng:
+          - nigeria
+        al:
+          - albania
+        is:
+          - iceland
+        hr:
+          - croatia
+        hu:
+          - hungary
+        ve:
+          - venezuela
+        bs:
+          - bahamas
+        gl:
+          - greenland
+        ar:
+          - argentina
+        mx:
+          - mexico
+        ae:
+          - united-arab-emirates
+        sa:
+          - saudi-arabia
+        qa:
+          - qatar
+        pa:
+          - panama
+        ph:
+          - philippines
+        bd:
+          - bangladesh
+        cn:
+          - china
+        hk:
+          - hong-kong
+        kh:
+          - cambodia
+        lk:
+          - sri-lanka
+        mo:
+          - macao
+        tw:
+          - taiwan
+        vn:
+          - vietnam
+        sg:
+          - singapore
+        mn:
+          - mongolia
+        in:
+          - india
+        nz:
+          - new-zealand
+        br:
+          - brazil
+        ee:
+          - estonia
+        lt:
+          - lithuania
+        za:
+          - south-africa
+
+    surfshark:
+      supports:
+        - openvpn_udp
+        - ipsec/ikev2
+        - wireguard
+      api_login: https://api.surfshark.com/v1/auth/login
+      api_auth_renew: https://api.surfshark.com/v1/auth/renew
+      api_credentials: https://api.surfshark.com/v1/account/users/me
+      api_wg_public_key: https://api.surfshark.com/v1/account/users/public-keys
+      api_servers_recommended: https://api.surfshark.com/v3/server/suggest
+      country:
+        al:
+          - al-tia.prod.surfshark.com
+        ar:
+          - ar-bua.prod.surfshark.com
+        at:
+          - at-vie.prod.surfshark.com
+        au:
+          - au-syd.prod.surfshark.com
+        be:
+          - be-ost.prod.surfshark.com
+        bg:
+          - bg-sof.prod.surfshark.com
+        br:
+          - br-sao.prod.surfshark.com
+        ca:
+          - ca-tor.prod.surfshark.com
+        ch:
+          - ch-zur.prod.surfshark.com
+        cl:
+          - cl-san.prod.surfshark.com
+        co:
+          - co-bog.prod.surfshark.com
+        cr:
+          - cr-sjn.prod.surfshark.com
+        cz:
+          - cz-prg.prod.surfshark.com
+        de:
+          - de-fra.prod.surfshark.com
+          - de-gun.prod.surfshark.com
+        dk:
+          - dk-cph.prod.surfshark.com
+        ee:
+          - ee-tll.prod.surfshark.com
+        es:
+          - es-mad.prod.surfshark.com
+        fi:
+          - fi-hel.prod.surfshark.com
+        fr:
+          - fr-par.prod.surfshark.com
+        gr:
+          - gr-ath.prod.surfshark.com
+        hk:
+          - hk-hkg.prod.surfshark.com
+        hr:
+          - hr-zag.prod.surfshark.com
+        hu:
+          - hu-bud.prod.surfshark.com
+        il:
+          - il-tlv.prod.surfshark.com
+        in:
+          - in-idr.prod.surfshark.com
+        is:
+          - is-rkv.prod.surfshark.com
+        it:
+          - it-mil.prod.surfshark.com
+          - it-rom.prod.surfshark.com
+        jp:
+          - jp-tok.prod.surfshark.com
+        kr:
+          - kr-seo.prod.surfshark.com
+        lu:
+          - lu-ste.prod.surfshark.com
+        lv:
+          - lv-rig.prod.surfshark.com
+        md:
+          - md-chi.prod.surfshark.com
+        my:
+          - my-kul.prod.surfshark.com
+        nl:
+          - nl-ams.prod.surfshark.com
+        no:
+          - no-osl.prod.surfshark.com
+        nz:
+          - nz-akl.prod.surfshark.com
+        pl:
+          - pl-waw.prod.surfshark.com
+        pt:
+          - pt-lou.prod.surfshark.com
+        ro:
+          - ro-buc.prod.surfshark.com
+        ru:
+          - ru-mos.prod.surfshark.com
+        se:
+          - se-sto.prod.surfshark.com
+        sg:
+          - sg-sng.prod.surfshark.com
+        si:
+          - si-lju.prod.surfshark.com
+        sk:
+          - sk-bts.prod.surfshark.com
+        tr:
+          - tr-bur.prod.surfshark.com
+        ua:
+          - ua-iev.prod.surfshark.com
+        gb:
+          - uk-lon.prod.surfshark.com
+          - uk-man.prod.surfshark.com
+        us:
+          - us-dal.prod.surfshark.com
+          - us-las.prod.surfshark.com
+          - us-lax.prod.surfshark.com
+          - us-mia.prod.surfshark.com
+          - us-nyc.prod.surfshark.com
+          - us-phx.prod.surfshark.com
+        vn:
+          - vn-hcm.prod.surfshark.com
+        za:
+          - za-jnb.prod.surfshark.com
+
+    nordvpn-app:
+      supports:
+        - openvpn
+        - nordlynx
+      country:
+        al:
+          - Albania
+        ar:
+          - Argentina
+        au:
+          - Australia
+        at:
+          - Austria
+        be:
+          - Belgium
+        ba:
+          - Bosnia_And_Herzegovina
+        br:
+          - Brazil
+        bg:
+          - Bulgaria
+        ca:
+          - Canada
+        cl:
+          - Chile
+        cr:
+          - Costa_Rica
+        hr:
+          - Croatia
+        cy:
+          - Cyprus
+        cz:
+          - Czech_Republic
+        dk:
+          - Denmark
+        ee:
+          - Estonia
+        fi:
+          - Finland
+        fr:
+          - France
+        ge:
+          - Georgia
+        de:
+          - Germany
+        gr:
+          - Greece
+        hk:
+          - Hong_Kong
+        hu:
+          - Hungary
+        is:
+          - Iceland
+        in:
+          - India
+        id:
+          - Indonesia
+        ie:
+          - Ireland
+        il:
+          - Israel
+        it:
+          - Italy
+        jp:
+          - Japan
+        lv:
+          - Latvia
+        lt:
+          - Lithuania
+        lu:
+          - Luxembourg
+        my:
+          - Malaysia
+        mx:
+          - Mexico
+        md:
+          - Moldova
+        nl:
+          - Netherlands
+        nz:
+          - New_Zealand
+        mk:
+          - North_Macedonia
+        no:
+          - Norway
+        pl:
+          - Poland
+        pt:
+          - Portugal
+        ro:
+          - Romania
+        rs:
+          - Serbia
+        sg:
+          - Singapore
+        sk:
+          - Slovakia
+        si:
+          - Slovenia
+        za:
+          - South_Africa
+        kr:
+          - South_Korea
+        es:
+          - Spain
+        se:
+          - Sweden
+        ch:
+          - Switzerland
+        tw:
+          - Taiwan
+        th:
+          - Thailand
+        tr:
+          - Turkey
+        ua:
+          - Ukraine
+        gb:
+          - United_Kingdom
+        us:
+          - United_States
+        vn:
+          - Vietnam

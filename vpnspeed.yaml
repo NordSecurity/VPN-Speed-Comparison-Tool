@@ -1,0 +1,98 @@
+config:
+  # Interval is the amount of time (in seconds) that is
+  # awaited before each test run
+  interval: 180
+
+  # This defines if all the combinations should run indefinitely (default,
+  # value 'continuous'), or just once (value 'once')
+  mode: continuous
+
+  # Define the number of times a single test combination is executed. 
+  # By default each combination is run only once.
+  repeats: 1
+
+  # Find Common cities for specified test groups.
+  # By default no common city search is executed
+  common_cities: true
+
+  # Groups define the VPN and speed test target countries
+  groups:
+    # The VPN country and target country can be provided
+    # in one of three ways. The short version is:
+    # 
+    #   - us:us
+    # 
+    # where the first country code is the VPN country, and the second
+    # is the speed test target country.
+    # The long version looks as such:
+    # 
+    #   - vpn_country: us
+    #     target_country: us
+    # 
+    # The last version is providing all desired VPN and target
+    # countries in lists. In this case, each VPN country will be
+    # paired with each target country.
+    # In case the VPN or target country is not relevant, specify
+    # `auto` instead of a country code.
+    multi:
+      vpns: [nl, us]
+      targets: [nl, us]
+
+  # This section defines which providers should be used, the details
+  # of technologies to use and credentials
+  vpns:
+
+    - name: nordvpn-app
+      credentials:
+        username: test
+        password: test
+      technologies:
+        - name: openvpn
+          protocols: [udp]
+        - name: nordlynx
+
+#    - name: expressvpn-app
+#      credentials:
+#        password: ACTIVATION-ID
+#      technologies:
+#        - name: lightway
+#        - name: openvpn
+#          protocols: [udp]
+
+#    - name: surfshark
+#      credentials:
+#        username: test
+#        password: test
+#      technologies:
+#        - name: openvpn
+#          protocols: [udp]
+#        - name: ipsec/ikev2
+#        - name: wireguard
+  
+#    - name: pia-app
+#      credentials:
+#          username: test
+#          password: test
+#      technologies:
+#       - name: openvpn
+#         protocols: [udp]
+#       - name: wireguard
+  
+#    - name: purevpn-app
+#      credentials:
+#        username: test
+#        password: test
+#      technologies:
+#        - name: openvpn
+#          protocols: [udp]
+
+# Data sinks define where the test data should be stored
+  sinks:
+    - name: sqlite
+      url: /var/run/vpnspeed/vpnspeed.db
+      as_backup: yes
+    # CSV style backup, useful for easier data debugging
+    # Note: only one sink should be marked 'as_backup: yes'
+    # - name: csv
+    #   url: /var/run/vpnspeed/vpnspeed.csv
+    #   as_backup: yes 

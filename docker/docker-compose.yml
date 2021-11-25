@@ -1,0 +1,18 @@
+version: "3.4"
+
+services:
+    runner:
+        build:
+            context: ../
+            dockerfile: docker/runner/Dockerfile
+        image: runner
+        cap_add: 
+            - ALL
+        privileged: true
+        volumes:
+            - /var/run/vpnspeed:/var/run/vpnspeed
+            - /var/log/vpnspeed:/var/log/vpnspeed
+            - /dev/net/tun:/dev/net/tun
+            - /var/run/docker.sock:/var/run/docker.sock
+            - ../report:/opt/vpnspeed/report
+        restart: always

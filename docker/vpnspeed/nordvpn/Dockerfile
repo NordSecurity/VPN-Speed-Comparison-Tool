@@ -7,7 +7,7 @@ RUN echo "deb http://deb.debian.org/debian/ buster-backports main contrib non-fr
     DEBIAN_FRONTEND=noninteractive apt-get -q -y --no-install-recommends install openvpn wireguard
 RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y autoremove --purge && \
     apt-get clean
-RUN export GIT_SSL_NO_VERIFY=1 && mkdir /opt/wg && cd /opt/wg && git clone https://git.zx2c4.com/wireguard-tools && \
+RUN mkdir /opt/wg && cd /opt/wg && git clone https://git.zx2c4.com/wireguard-tools && \
     make -C wireguard-tools/src -j$(nproc) && make -C wireguard-tools/src install && cd -
 
 ARG NORDVPN_APP_INSTALL_DEB=nordvpn-release_1.0.0_all.deb 

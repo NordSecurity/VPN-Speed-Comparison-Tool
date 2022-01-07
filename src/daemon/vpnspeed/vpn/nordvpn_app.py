@@ -37,9 +37,15 @@ class NordvpnApp(VPNProvider):
             VPNTechnology("nordlynx"),
         ]
 
+    # Mitigate error when app does not remove dns protection.
+    async def clean_resolv_conf(self):
+        log.debug("Cleaning immutable flag from /etc/resolv.conf")
+        await self._env.exec("/usr/bin/chattr", ["-i", "/etc/resolv.conf"])
+
     async def check_vpn_running(self, env: ContainerEnvironment):
         returncode, stdout = await env.exec("/entrypoint.sh", allow_error=True)
         if returncode != 0:
+            await self.clean_resolv_conf()
             raise VPNConnectionFailed("Failed to start Nordvpn: {}".format(stdout))
 
     async def get_countries(self, env: ContainerEnvironment):
@@ -191,3 +197,4 @@ class NordvpnApp(VPNProvider):
     async def disconnect(self):
         await self._env.exec(_APP, "disconnect")
         await self._env.exec(_APP, "logout")
+        await self.clean_resolv_conf()

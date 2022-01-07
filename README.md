@@ -4,6 +4,8 @@ This is a tool, written in Python, for assessing network speed over VPN connecti
 
 It is composed of two main parts: the daemon, which is invoked using the `vpnspeedd` command, and the client, which is invoked using the `vpnspeed` command. The daemon awaits instructions from the client and executes the given tests in the background. The client controls the test configuration and daemon life-cycle.
 
+Detailed whitepaper with the methodology can be found here: https://nordvpn.com/vpn-speed-test/
+
 ### Dependencies:
 ```
 apt-transport-https  

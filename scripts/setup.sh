@@ -53,13 +53,17 @@ prn "SETUP DOCKER..."
 
 apt install -y apt-transport-https ca-certificates curl software-properties-common gnupg
 curl -fsSL https://download.docker.com/linux/$OS/gpg | apt-key add -
-add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/${OS} ${OS_VERSION_CODENAME} stable edge test"
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
 apt update
 apt install -y docker-ce
 systemctl start docker
 systemctl enable docker
-curl -L "https://github.com/docker/compose/releases/download/1.26.2/docker-compose-Linux-x86_64" -o /usr/local/bin/docker-compose
+curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 chmod +x /usr/local/bin/docker-compose
+ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 
 prn "SETUP HOST WIREGUARD"
 

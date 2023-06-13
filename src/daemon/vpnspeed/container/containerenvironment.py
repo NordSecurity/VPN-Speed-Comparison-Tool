@@ -8,6 +8,7 @@ import time
 from vpnspeed import log, resources
 from vpnspeed.container import ContainerUtils
 from vpnspeed.utils import try_json
+from vpnspeed.errors import *
 import yaml
 
 
@@ -56,7 +57,7 @@ class ContainerEnvironment:
                 json = try_json(result)
                 if json is not None:
                     return [0, json]
-            return [-1, None]
+            return [-2, stdout]
         stdout = "".join(stdout) if type(stdout) is list else stdout
         return [0, stdout]
 
@@ -111,7 +112,7 @@ class ContainerEnvironment:
         await self._dockerContainer.create(image_name, container_name, container_cmd)
         self._error_message = self._dockerContainer.get_error_message()
         if self._error_message is not None:
-            return self
+            raise VPNSpeedError("Unable to create env '{}'".format(self._error_message))
         await self._dockerContainer.connect()
         return self
 

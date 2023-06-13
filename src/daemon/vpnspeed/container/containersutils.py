@@ -95,15 +95,19 @@ class ContainerUtils:
     async def raw_exec(self, cmd: str, user: str = "root", allow_error: bool = False):
         log.debug("exec cmd:\n {}".format(cmd))
         message_list = list()
-        execute_cmd = await self._container.exec(
-            cmd,
-            stderr=True,
-            stdout=True,
-            stdin=False,
-            tty=False,
-            privileged=True,
-            user=user,
-        )
+        try:
+            execute_cmd = await self._container.exec(
+                cmd,
+                stderr=True,
+                stdout=True,
+                stdin=False,
+                tty=False,
+                privileged=True,
+                user=user,
+            )
+        except RuntimeError as e:
+            if e.message == "RuntimeError: Session is closed":
+                return -1
         result_stream = execute_cmd.start()
         message = await result_stream.read_out()
         while message is not None:
@@ -140,7 +144,7 @@ class ContainerUtils:
             else:
                 return [0, None]
         except asyncio.TimeoutError:
-            return [-1, "timeouted"]
+            return [-1, "timeout"]
 
     async def disconnect(self):
         await self._container_ws.close()

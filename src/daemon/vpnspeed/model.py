@@ -82,6 +82,7 @@ class Probe:
     city: str
     provider: str = None
     start_time: datetime = None
+    name: str = None
 
     def __str__(self):
         return "Location({}, {}, {}, {})".format(

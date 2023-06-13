@@ -121,44 +121,49 @@ class SpeedTestCliTester(Tester):
 
         log.debug("Running speedtest-cli... %s", repr(args))
         log.info("Starting sppedtest-cli...")
-        returncode, stdout = await env.exec(
+        returncode, json_stdout = await env.exec(
             "/usr/bin/speedtest", args, output=True, resp_json=True, allow_error=True
         )
-        if stdout is None:
-            raise TestRunError("Speedtest-cli subprocess timeout.")
+        if json_stdout is None:
+            raise TestCaseError("Speedtest-cli subprocess timeout.")
 
         if returncode != 0:
-            raise TestRunError("Exited with: {}\n".format(returncode))
+            raise TestCaseError("Exited with: {}\n".format(returncode))
+
+        if "error" in json_stdout:
+            raise TestCaseError(
+                "Speedtest-cli result was an error: {}".format(json_stdout["error"])
+            )
 
         log.info("speedtest-cli completed.")
-        res = stdout
+        speedtest_result = json_stdout
         try:
-            country = countries.get(name=res["server"]["country"])
+            country = countries.get(name=speedtest_result["server"]["country"])
             result = TestRun(
-                timestamp=datetime.fromisoformat(res["timestamp"][:-1]),
-                ping_latency=res["ping"]["latency"],
-                ping_jitter=res["ping"]["jitter"],
-                download_bandwidth=res["download"]["bandwidth"],
-                download_bytes=res["download"]["bytes"],
-                download_elapsed=res["download"]["elapsed"],
-                upload_bandwidth=res["upload"]["bandwidth"],
-                upload_bytes=res["upload"]["bytes"],
-                upload_elapsed=res["upload"]["elapsed"],
-                isp=res["isp"],
-                interface_name=res["interface"]["name"],
-                interface_internal_ip=res["interface"]["internalIp"],
-                interface_external_ip=res["interface"]["externalIp"],
-                server_id=res["server"]["id"],
-                server_name=res["server"]["name"],
-                server_host=res["server"]["host"],
-                server_ip=res["server"]["ip"],
-                server_location=res["server"]["location"],
-                server_country=res["server"]["country"],
+                timestamp=datetime.fromisoformat(speedtest_result["timestamp"][:-1]),
+                ping_latency=speedtest_result["ping"]["latency"],
+                ping_jitter=speedtest_result["ping"]["jitter"],
+                download_bandwidth=speedtest_result["download"]["bandwidth"],
+                download_bytes=speedtest_result["download"]["bytes"],
+                download_elapsed=speedtest_result["download"]["elapsed"],
+                upload_bandwidth=speedtest_result["upload"]["bandwidth"],
+                upload_bytes=speedtest_result["upload"]["bytes"],
+                upload_elapsed=speedtest_result["upload"]["elapsed"],
+                isp=speedtest_result["isp"],
+                interface_name=speedtest_result["interface"]["name"],
+                interface_internal_ip=speedtest_result["interface"]["internalIp"],
+                interface_external_ip=speedtest_result["interface"]["externalIp"],
+                server_id=speedtest_result["server"]["id"],
+                server_name=speedtest_result["server"]["name"],
+                server_host=speedtest_result["server"]["host"],
+                server_ip=speedtest_result["server"]["ip"],
+                server_location=speedtest_result["server"]["location"],
+                server_country=speedtest_result["server"]["country"],
                 server_country_code=country and iso_to_cc(country.alpha_2),
-                packet_loss=res.get("packetLoss"),
+                packet_loss=speedtest_result.get("packetLoss"),
             )
         except KeyError as e:
-            raise TestRunError("Incomplete speedtestcli data: " + str(e))
+            raise TestCaseError("Incomplete speedtestcli data: " + str(e))
 
         log.debug("Test passed:\n\t{}".format(result))
         return result

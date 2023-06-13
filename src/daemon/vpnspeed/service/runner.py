@@ -103,6 +103,7 @@ class Runner:
         try:
             runs = 0
             group = None
+            reset_then_no_options_found = False
             while True:
                 groups = await self.get_groups()
                 groups_len = groups and len(groups) or 0
@@ -110,15 +111,22 @@ class Runner:
                 run_target = groups_len * cases_len
                 log.info("Run: {}/{}".format(runs, run_target))
                 log.info("group count: {}".format(groups_len))
-                if runs >= run_target:
+                if runs >= run_target or reset_then_no_options_found:
                     log.debug("Ran {} tests, clear all fails".format(runs))
 
                     if mode == Mode.once:
                         return
                     runs = 0
                     group = None
-
-                new_group, case = select(groups)
+                # Handle test case where no test option found
+                new_group, case = select(groups) or (None, None)
+                if new_group is None and case is None:
+                    log.info(
+                        "No option found for selecting new group to run. Resetting run and fails..."
+                    )
+                    await self._clear_fails()
+                    reset_then_no_options_found = True
+                    continue
                 if (
                     not group
                     or group.vpn_country != new_group.vpn_country
@@ -142,8 +150,6 @@ class Runner:
                 for _ in range(repeats):
                     await self._run_case(group, case)
                 runs += 1
-
-            log.debug("Done running the tests")
         except asyncio.CancelledError:
             log.info("Worker stopped")
         except Exception as e:

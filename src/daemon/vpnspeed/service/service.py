@@ -101,6 +101,18 @@ class Service:
                 self._context.config.interval, self._context.config.common_cities
             )
             await self.execute(actions)
+            if self._context.probe is not None:
+                await self._sink.set_probe(
+                    Probe(
+                        ip=self._probe.ip,
+                        country=self._probe.country,
+                        country_code=self._probe.country_code,
+                        city=self._probe.city,
+                        provider=self._probe.provider,
+                        start_time=self._probe.start_time,
+                        name=self._context.probe.name,
+                    )
+                )
 
     async def execute(self, actions: List[Action]):
         for action in sorted(actions, key=lambda x: x.mark):

@@ -1,5 +1,6 @@
 import random
 from .model import *
+from vpnspeed import log
 
 
 def _all_equal(iterator):
@@ -12,12 +13,14 @@ def _all_equal(iterator):
 
 
 def _select_least_runned_in_group(groups: List[Group]) -> (TestGroup, TestCase):
+    log.info("Selecting least runned group...")
     groups_runs = [
         (group, min(case.run_count for case in group.cases))
         for group in groups
         if not group.failing
     ]
     if len(groups_runs) == 0:
+        log.info("Group run is: {}".format(len(groups_runs)))
         return None
 
     uneven = [
@@ -37,6 +40,7 @@ def _select_least_runned_in_group(groups: List[Group]) -> (TestGroup, TestCase):
         if case.run_count == min_runs and case.fail_count >= 0
     ]
     if len(options) == 0:
+        log.info("Group options is: {}".format(len(options)))
         return None
     return random.choice(options)
 

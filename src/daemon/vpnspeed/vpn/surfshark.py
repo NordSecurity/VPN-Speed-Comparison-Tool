@@ -1,9 +1,6 @@
-import asyncio
-import logging
 import os
 import aiohttp
 import json
-import urllib
 
 from vpnspeed.errors import *
 from vpnspeed.model import *
@@ -12,10 +9,10 @@ from .dynamic import dynamic
 from .templated import Templated
 
 from vpnspeed.utils import trim_new_line
-from vpnspeed import resources, log
+from vpnspeed import log
 from datetime import datetime, timedelta
 import uuid
-import glob
+from vpnspeed.container import ContainerEnvironment
 
 
 _NAME = "surfshark"
@@ -33,6 +30,8 @@ class SurfShark(Templated):
     __public_key: str = None
     __server_public_key: str = None
     __wg_private_key_file: str = None
+    __city_set = set()
+    __city_map = {}
 
     @staticmethod
     def get_name() -> str:
@@ -41,7 +40,51 @@ class SurfShark(Templated):
     def _get_headers(self, token):
         return {"Authorization": "Bearer " + token}
 
+    async def get_cities(self, country: str) -> set:
+        if self.__username is None and self.__password is None:
+            # We set up token on runner container
+            env = None
+            await self.login(env)
+        else:
+            await self._renew_token()
+        url = (
+            self.CONFIG["plugin"]["provider"][self.get_name()][
+                "api_servers_recommended"
+            ]
+            + "/"
+            + country
+            + "?limit=100"
+        )
+        log.debug("get_city : Country url: {}".format(url))
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(
+                    url, headers=self._get_headers(self.__token)
+                ) as res:
+                    if res.status != 200:
+                        raise TestRunError(
+                            "Failed to get city servers for Surfshark VPN, Response({}):\n{}".format(
+                                res.status, await res.text()
+                            )
+                        )
+                    data = await res.text()
+                    data_json = json.loads(data)
+                    log.debug("Got cities: {}".format(data_json))
+                    city_index = 0
+                    for element in data_json:
+                        log.debug("city: {}".format(element["location"]))
+                        self.__city_set.add(element["location"])
+                        self.__city_map[element["location"]] = city_index
+                        city_index += 1
+                    log.debug("Got city set {}".format(self.__city_set))
+                    log.debug("Got city map: {}".format(self.__city_map))
+                    return self.__city_set
+        except Exception as e:
+            raise TestRunError("Connection Error: {}!".format(e))
+        return []
+
     async def login(self, env):
+        log.debug("Inner login was called!?")
         if self.__username is None and self.__password is None:
             async with aiohttp.ClientSession() as session:
                 try:
@@ -61,6 +104,7 @@ class SurfShark(Templated):
                         data = await res.text()
                         data_json = json.loads(data)
                         self.__token = data_json["token"]
+                        log.debug("Got token: {}".format(self.__token))
                         self.__renew_token = data_json["renewToken"]
                     async with session.get(
                         self.CONFIG["plugin"]["provider"][self.get_name()][
@@ -79,8 +123,8 @@ class SurfShark(Templated):
                         log.debug("Surfshark API login OK.")
                         self.__username = data_json["serviceCredentials"]["username"]
                         self.__password = data_json["serviceCredentials"]["password"]
-                except:
-                    raise TestRunError("Connection Error!")
+                except Exception as e:
+                    raise TestRunError("Connection Error: {}!".format(e))
             return await super().login(
                 env,
                 VPNCredentials(
@@ -108,8 +152,8 @@ class SurfShark(Templated):
                     data_json = json.loads(data)
                     self.__token = data_json["token"]
                     log.debug("Surfshark API auth renew OK.")
-            except:
-                raise TestRunError("Connection Error!")
+            except Exception as e:
+                raise TestRunError("Connection Error: {}!".format(e))
 
     async def connect(self, env, group: TestGroup, case: TestCase):
 
@@ -123,8 +167,8 @@ class SurfShark(Templated):
 
         if group.vpn_country != "auto":
             log.debug("Target country is {}".format(group.vpn_country))
-            url += "/" + group.vpn_country
-
+            url += "/" + group.vpn_country + "?limit=100"
+        log.debug("Connection info: url: {}, token: {}".format(url, self.__token))
         async with aiohttp.ClientSession() as session:
             try:
                 if case.technology == "wireguard":
@@ -146,8 +190,8 @@ class SurfShark(Templated):
                         )
                     data = await res.text()
                     self.__recommended = json.loads(data)
-            except:
-                raise TestRunError("Connection Error!")
+            except Exception as e:
+                raise TestRunError("Connection Error: {}!".format(e))
 
         return await super().connect(env, group, case)
 
@@ -243,8 +287,11 @@ class SurfShark(Templated):
             self._save_wg_key_data(self.__private_key, expires_at, self.__username)
 
     async def _get_recommended_server(self, group: TestGroup) -> str:
-        self.__server_public_key = self.__recommended[0]["pubKey"]
-        return self.__recommended[0]["connectionName"]
+        recommended_index = 0
+        if group.vpn_city and group.vpn_city in self.__city_map:
+            recommended_index = self.__city_map[group.vpn_city]
+        self.__server_public_key = self.__recommended[recommended_index]["pubKey"]
+        return self.__recommended[recommended_index]["connectionName"]
 
     def _generate_config(self, **kwargs) -> str:
         return super()._generate_config(

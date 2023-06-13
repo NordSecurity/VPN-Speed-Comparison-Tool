@@ -6,7 +6,7 @@ ENV DOCKER_DIST_POOL="https://download.docker.com/linux/debian/dists/buster/pool
 
 RUN  apt-get update && \ 
         DEBIAN_FRONTEND=noninteractive apt-get -q -y --no-install-recommends install \
-        procps vim curl build-essential expect ca-certificates python3-dev python3-pip python3-yaml python3-setuptools python3-wheel
+        procps vim curl build-essential expect ca-certificates python3-dev python3-pip python3-setuptools python3-wheel
 
 RUN mkdir -p /tmp/docker/
 RUN curl -so /tmp/docker/${DOCKER_CLI_DEB} ${DOCKER_DIST_POOL}/${DOCKER_CLI_DEB} && \

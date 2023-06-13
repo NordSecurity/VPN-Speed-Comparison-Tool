@@ -100,12 +100,12 @@ setup(
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
         "yarl==1.4.2",
-        "pillow==8.3.2",
+        "pillow==9.5.0",
         "asyncio",
         "aiohttp",
         "aiofiles",
         "jsonpickle",
-        "PyYAML",
+        "PyYAML==6.0",
         "python-crontab",
     ],  # Optional
     # List additional groups of dependencies here (e.g. development

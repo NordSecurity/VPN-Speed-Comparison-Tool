@@ -1,15 +1,14 @@
 #!/usr/bin/expect -- 
 
-set user [lindex $argv 0]
-set passwd [lindex $argv 1]
+set token [lindex $argv 0]
 
 set timeout 360
 
-spawn nordvpn login --username "$user" --password "$passwd"
+spawn nordvpn login --token "$token"
 
 expect {
      "Welcome to NordVPN! You can now connect to VPN by using 'nordvpn connect'." { exit 0 }
-     "Username or password is not correct. Please try again." { puts stderr "Failed to login" ; exit 1 }
+     "We couldn't log you in - the access token is not valid. Please check if you've entered the token correctly. If the issue persists, contact our customer support." { puts stderr "Failed to login" ; exit 1 }
      "Your account has expired. Renew your subscription now to continue enjoying the ultimate privacy and security with NordVPN." { puts stderr "Login expired error" ; exit 1 }
      timeout { puts stderr "Timeouted" ; exit 1 }
      eof

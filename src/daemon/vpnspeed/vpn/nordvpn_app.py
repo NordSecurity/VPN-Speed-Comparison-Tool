@@ -38,28 +38,32 @@ class NordvpnApp(VPNProvider):
         ]
 
     # Mitigate error when app does not remove dns protection.
-    async def clean_resolv_conf(self):
+    async def clean_resolv_conf(self, env: ContainerEnvironment):
         log.debug("Cleaning immutable flag from /etc/resolv.conf")
-        await self._env.exec("/usr/bin/chattr", ["-i", "/etc/resolv.conf"])
+        await env.exec("/usr/bin/chattr", ["-i", "/etc/resolv.conf"], allow_error=True)
 
     async def check_vpn_running(self, env: ContainerEnvironment):
         returncode, stdout = await env.exec("/entrypoint.sh", allow_error=True)
         if returncode != 0:
-            await self.clean_resolv_conf()
+            await self.clean_resolv_conf(env)
             raise VPNConnectionFailed("Failed to start Nordvpn: {}".format(stdout))
 
     async def get_countries(self, env: ContainerEnvironment):
-        await self.check_vpn_running(env)
+        if env:
+            await self.check_vpn_running(env)
         returncode, stdout = await env.exec(_APP, ["countries"], output=True)
         if returncode != 0 or stdout is None:
             raise TestCaseError(
                 "Unable to get Nordvpn countries, return result {}!".format(stdout)
             )
         country_entries = [entry for entry in stdout.split(", ")]
-        if not country_entries:
+        filtered_countries = [
+            o_entry for o_entry in country_entries if " " not in o_entry
+        ]
+        if not filtered_countries:
             raise TestCaseError("Error in parsing country list!")
-        log.info("Got countries {}".format(country_entries))
-        return country_entries
+        log.info("Got countries {}".format(filtered_countries))
+        return filtered_countries
 
     def country_to_code(self, country: str) -> str:
         know_country_list = self.CONFIG["plugin"]["provider"][self.get_name()][
@@ -72,7 +76,8 @@ class NordvpnApp(VPNProvider):
 
     async def get_cities(self, country: str) -> set:
         async with ContainerEnvironment(_NAME) as env:
-            await self.check_vpn_running(env)
+            if env:
+                await self.check_vpn_running(env)
             app_countries = await self.get_countries(env)
             cities = set()
             for app_country in app_countries:
@@ -91,7 +96,12 @@ class NordvpnApp(VPNProvider):
                     cities_entry = [entry for entry in stdout.split(", ")]
                     if cities_entry:
                         for city in cities_entry:
-                            cities.add(city.replace("\r", "").replace("-", "").strip())
+                            cities.add(
+                                city.replace("\r", "")
+                                .replace("-", "")
+                                .replace("_", " ")
+                                .strip()
+                            )
                         self._cities[app_country] = cities
             if cities is not None and len(cities) != 0:
                 log.debug("City list: {}".format(cities))
@@ -118,10 +128,9 @@ class NordvpnApp(VPNProvider):
                     target_city = [
                         city
                         for city in self._cities[app_country]
-                        if city.lower() == vpn_city
+                        if city.lower().replace(" ", "_") == vpn_city
                     ]
                     if target_city:
-                        # log.info("geiting index: {}".format(target_city))
                         target_city = str(target_city[0]).lower()
                     # log.info("Target city: {}".format(target_city))
                 if vpn_city != target_city:
@@ -158,7 +167,7 @@ class NordvpnApp(VPNProvider):
             raise VPNConnectionFailed("Failed to start Nordvpn: {}".format(stdout))
         returncode, stdout = await self._env.exec(
             "/usr/bin/nordvpn-login",
-            [self._creds.username, self._creds.password],
+            self._creds.password,
             output=True,
         )
         log.debug("Return code: {}, stdout: {}".format(returncode, stdout))
@@ -196,5 +205,5 @@ class NordvpnApp(VPNProvider):
 
     async def disconnect(self):
         await self._env.exec(_APP, "disconnect")
-        await self._env.exec(_APP, "logout")
-        await self.clean_resolv_conf()
+        await self._env.exec(_APP, ["logout", "--persist-token"])
+        await self.clean_resolv_conf(self._env)

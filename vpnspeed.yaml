@@ -44,8 +44,7 @@ config:
 
     - name: nordvpn-app
       credentials:
-        username: test
-        password: test
+        password: token
       technologies:
         - name: openvpn
           protocols: [udp]

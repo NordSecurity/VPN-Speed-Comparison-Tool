@@ -4,18 +4,14 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y --no-install-recommends install
 
 RUN echo "deb http://deb.debian.org/debian/ buster-backports main contrib non-free" > /etc/apt/sources.list.d/unstable.list && \
     apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get -q -y --no-install-recommends install openvpn wireguard
+    DEBIAN_FRONTEND=noninteractive apt-get -q -y --no-install-recommends install openvpn wireguard build-essential
 RUN DEBIAN_FRONTEND=noninteractive apt-get -q -y autoremove --purge && \
     apt-get clean
 RUN mkdir /opt/wg && cd /opt/wg && git clone https://git.zx2c4.com/wireguard-tools && \
     make -C wireguard-tools/src -j$(nproc) && make -C wireguard-tools/src install && cd -
 
-ARG NORDVPN_APP_INSTALL_DEB=nordvpn-release_1.0.0_all.deb 
-RUN curl https://repo.nordvpn.com/deb/nordvpn/debian/pool/main/${NORDVPN_APP_INSTALL_DEB} --output /tmp/${NORDVPN_APP_INSTALL_DEB}
-
-
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y /tmp/${NORDVPN_APP_INSTALL_DEB}
-RUN DEBIAN_FRONTEND=noninteractive apt-get update
+RUN curl -sSf https://downloads.nordcdn.com/apps/linux/install.sh -o /tmp/nordvpn_install.sh && chmod +x /tmp/nordvpn_install.sh
+RUN yes | /tmp/nordvpn_install.sh
 
 ENV TZ=Europe/Amsterdam
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone

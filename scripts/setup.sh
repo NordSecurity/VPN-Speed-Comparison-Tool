@@ -44,10 +44,23 @@ export COMPOSE_INTERACTIVE_NO_CLI=1
 prn "SETUP HOST CLI"
 apt update
 apt install -y python3-dev python3-pip python3-yaml python3-setuptools python3-wheel jq
-#Update pip3 to latest
-pip3 install --upgrade pip
+PIP3="pip3"
 
-pip3 install -U "$BASEDIR/src/cli"
+# Install python 3.8 for debian 10
+export $(grep VERSION_ID /etc/os-release)
+if [[ $VERSION_ID  == \"10\" ]] ; then
+    prn "SETUP PYTHON..."
+    apt install -y zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libsqlite3-dev libreadline-dev libffi-dev libbz2-dev curl
+    cd /opt && curl -O https://www.python.org/ftp/python/3.8.2/Python-3.8.2.tar.xz && \
+         tar -xf Python-3.8.2.tar.xz && \
+        cd Python-3.8.2 && ./configure --enable-optimizations && make -j$(nproc) && make altinstall
+    PIP3="pip3.8"
+fi
+
+#Update pip3 to latest
+${PIP3} install --upgrade pip
+
+${PIP3} install -U "$BASEDIR/src/cli"
 
 prn "SETUP DOCKER..."
 

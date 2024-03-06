@@ -18,11 +18,18 @@ RUN curl -so /tmp/docker/${DOCKER_CE_CLI_DEB} ${DOCKER_DIST_POOL}/${DOCKER_CE_CL
 RUN curl -so /tmp/docker/${DOCKER_CONTAINERD_DEB} ${DOCKER_DIST_POOL}/${DOCKER_CONTAINERD_DEB} && \
         DEBIAN_FRONTEND=noninteractive apt-get -q -y install /tmp/docker/${DOCKER_CONTAINERD_DEB}
 
-RUN pip3 install --upgrade pip
+# Setup python3.8
+RUN  apt-get update && \
+        DEBIAN_FRONTEND=noninteractive apt-get -q -y --no-install-recommends install \
+        zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libsqlite3-dev libreadline-dev libffi-dev libbz2-dev
+RUN cd /opt && curl -O https://www.python.org/ftp/python/3.8.2/Python-3.8.2.tar.xz && tar -xf Python-3.8.2.tar.xz &&  \
+        cd Python-3.8.2 && ./configure --enable-optimizations && make -j$(nproc) && make altinstall
+
+RUN pip3.8 install --upgrade pip
 ADD ./ /opt/vpnspeed
 RUN chmod +x /opt/vpnspeed/docker/dockerBuild.sh
 RUN mkdir -p /var/run/vpnspeed
-RUN pip3 install /opt/vpnspeed
+RUN pip3.8 install /opt/vpnspeed
 ADD docker/runner/entrypoint.sh /entrypoint.sh
 RUN chmod +x entrypoint.sh
 WORKDIR /opt/vpnspeed

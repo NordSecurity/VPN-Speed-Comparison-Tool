@@ -14,15 +14,14 @@ setup(
         #   4 - Beta
         #   5 - Production/Stable
         "Development Status :: 3 - Alpha",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
     ],
     packages=find_packages(),  # Required
-    python_requires=">=3.7, <4",
+    python_requires=">=3.8, <4",
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
         "yarl==1.4.2",
-        "pillow==9.5.0",
+        "pillow==10.2.0",
         "asyncio",
         "aiodocker",
         "aiorwlock",

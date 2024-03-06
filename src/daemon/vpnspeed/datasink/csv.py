@@ -61,13 +61,19 @@ class CSV(DataBackup):
         def prefixed(prefix, obj) -> dict:
             return {f"{prefix}_{k}": v for k, v in obj.__dict__.items()}
 
-        df = self._base.append(
-            {
-                **prefixed("probe", probe),
-                **prefixed("group", group),
-                **prefixed("case", case),
-                **prefixed("run", run),
-            },
+        df = pd.concat(
+            [
+                self._base,
+                pd.DataFrame(
+                    {
+                        **prefixed("probe", probe),
+                        **prefixed("group", group),
+                        **prefixed("case", case),
+                        **prefixed("run", run),
+                    },
+                    index=[0],
+                ),
+            ],
             ignore_index=True,
         )
 

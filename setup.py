@@ -20,7 +20,6 @@ setup(
         #   4 - Beta
         #   5 - Production/Stable
         "Development Status :: 3 - Alpha",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
     ],
     package_dir={
@@ -29,10 +28,10 @@ setup(
     },
     py_modules=["vpnspeed_cli"],
     packages=find_packages("src/daemon/"),
-    python_requires=">=3.7, <4",
+    python_requires=">=3.8, <4",
     install_requires=[
         "yarl==1.4.2",
-        "pillow==9.5.0",
+        "pillow==10.2.0",
         "asyncio",
         "aiodocker",
         "aiorwlock",

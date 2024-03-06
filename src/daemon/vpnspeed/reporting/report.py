@@ -231,10 +231,15 @@ class ReportGenerator:
             min_value = case[filter_.value].quantile(filter_.outliers)
             max_value = case[filter_.value].quantile(1 - filter_.outliers)
 
-            df = df.append(
-                case[
-                    (case[filter_.value] > min_value)
-                    & (case[filter_.value] < max_value)
+            df = pd.concat(
+                [
+                    df,
+                    pd.DataFrame(
+                        case[
+                            (case[filter_.value] > min_value)
+                            & (case[filter_.value] < max_value)
+                        ]
+                    ),
                 ]
             )
         return df

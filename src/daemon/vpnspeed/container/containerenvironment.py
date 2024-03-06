@@ -112,7 +112,9 @@ class ContainerEnvironment:
         await self._dockerContainer.create(image_name, container_name, container_cmd)
         self._error_message = self._dockerContainer.get_error_message()
         if self._error_message is not None:
-            raise VPNSpeedError("Unable to create env '{}'".format(self._error_message))
+            raise VPNSpeedError(
+                "Unavailable to create env '{}'".format(self._error_message)
+            )
         await self._dockerContainer.connect()
         return self
 
